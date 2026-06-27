@@ -1,16 +1,22 @@
+from turtle import heading
+
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
 # hyperparameters
-batch_size = 32  # how many independent sequences will we process //rl?
-block_size = 8  # what is the max context length for the prediction?
-max_iters = 3000
-eval_interval = 300
-learning_rate = 1e-3
+batch_size = 64  # how many independent sequences will we process //rl?
+block_size = 256  # what is the max context length for the prediction?
+max_iters = 5000
+eval_interval = 500
+learning_rate = 3e-4
 device = "cuda" if torch.cuda.is_available() else "cpu"
 eval_iters = 200
-n_embd = 32  # number of embedding dimensions
+n_embd = 384  # number of embedding dimensions
+n_head = 4  # (384/6 = 64) that means every head is 64-dimensional
+n_layer = 4
+dropout = 0.2 # 20% of calculations
+
 # ----------------
 
 torch.manual_seed(1337)
@@ -24,7 +30,7 @@ vocab_size = len(chars)
 stoi = {ch: i for i, ch in enumerate(chars)}
 itos = {i: ch for i, ch in enumerate(chars)}
 encode = lambda s: [stoi[c] for c in s]  # encoder : take a string, output a list of string
-decode = lambda l: "".join([itos[i] for i in l])  # decoder: take a list of integers, output a string
+decode = lambda L: "".join([itos[i] for i in L])  # decoder: take a list of integers, output a string
 
 # Let's split the dataset for training
 data = torch.tensor(encode(text), dtype=torch.long)
@@ -40,7 +46,7 @@ def get_batch(split):
     ix = torch.randint(len(data) - block_size, (batch_size,))
     x = torch.stack([data[i : i + block_size] for i in ix])
     y = torch.stack([data[i + 1 : i + block_size + 1] for i in ix])
-    return x, y
+    return x.to(device), y.to(device)
 
 
 @torch.no_grad()
@@ -60,12 +66,13 @@ def estimate_loss():
 class Head(nn.Module):
     """One Head of Self-Attention"""
 
-    def __init__(self, n_embd, head_size):
+    def __init__(self, head_size):
         super().__init__()
         self.key = nn.Linear(n_embd, head_size, bias=False)
         self.query = nn.Linear(n_embd, head_size, bias=False)
         self.value = nn.Linear(n_embd, head_size, bias=False)
         self.register_buffer('tril', torch.tril(torch.ones(block_size, block_size)))
+        self.dropout = nn.Dropout(dropout)
         
 
     def forward(self, x):
@@ -73,14 +80,61 @@ class Head(nn.Module):
         k = self.key(x) # (B, T, C)
         q = self.query(x) # (B, T, C)
         # compute attention scores ("Affinities")
-        wei = q @ k.transpose(-2, -1) * C**-0.5 # (B, T, C) @ (B, C, T) = (B, T, T)
+        head_size = k.size(-1)
+        wei = q @ k.transpose(-2, -1) * head_size**-0.5 # (B, T, C) @ (B, C, T) = (B, T, T)
         wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf')) # (B, T, T)
         wei = F.softmax(wei, dim=-1) # (B, T, T)
+        wei = self.dropout(wei)
         # perform the weighted aggregation of the values
         v = self.value(x) # (B, T, C)
         out = wei @ v # (B, T, T) @ (B, T, C) = (B, T, C)
         return out
 
+class MultiHeadAttention(nn.Module):
+    """Multiple Heads of Self-Attention in Parallel"""
+
+    def __init__(self, num_heads, head_size):
+        super().__init__()
+        self.heads = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
+        self.proj = nn.Linear(n_embd, n_embd)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        out = torch.cat([h(x) for h in self.heads], dim=-1)
+        out = self.proj(out)
+        return out
+
+class FeedForward(nn.Module):
+    """Feed Forward Layer"""
+
+    def __init__(self, n_embd):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(n_embd, 4 * n_embd), # up_projection
+            nn.ReLU(),
+            nn.Linear(4 * n_embd, n_embd), # down_projection
+            nn.Dropout(dropout),
+        )
+        
+
+    def forward(self, x):
+        return self.net(x)
+
+class Block(nn.Module):
+    """Transformer Block : communication followed by computation"""
+
+    def __init__(self, n_embd, num_heads):
+        # n_embd: embedding dimension, num_heads: the number of heads we'd like
+        super().__init__()
+        self.sa_head = MultiHeadAttention(num_heads, n_embd // num_heads)
+        self.ffwd = FeedForward(n_embd)
+        self.ln1 = nn.LayerNorm(n_embd) # Norm : this normalises the features across the rows before passing them to the attention head
+        self.ln2 = nn.LayerNorm(n_embd) # Norm : this normalises the features across the rows before passing them to the feed forward layer
+
+    def forward(self, x): # Residual Connections: Optimisation in deep neural networks in which the output of a layer is added back to its input because it helps with gradient flow and stabilisation. In the Photo this process is called as Add (not Norm)
+        x = x + self.sa_head(self.ln1(x))
+        x = x + self.ffwd(self.ln2(x))
+        return x
 
 
 # super simple bigram model
@@ -92,7 +146,11 @@ class BigramModel(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, n_embd) #no. of embedding dimensions = n_embd
         self.position_embedding_table = nn.Embedding(block_size, n_embd) #no. of embedding dimensions = n_embd
-        self.sa_head = Head(n_embd) #self-attention head
+        # self.sa_head = Head(head_size=n_embd) #self-attention head
+        # self.sa_head = MultiHeadAttention(num_heads=4, head_size=n_embd // 4) # i.e. 4 heads of 8D-al self-attention
+        # self.ffwd = FeedForward(n_embd, num_heads=4)
+        self.block = nn.Sequential(*[Block(n_embd, num_heads=n_head) for _ in range(n_layer)])
+        self.ln_f = nn.LayerNorm(n_embd) # final layer norm
         self.lm_head = nn.Linear(n_embd, vocab_size) #linear layer to map the embedding to the vocab size
         
 
@@ -103,7 +161,9 @@ class BigramModel(nn.Module):
         tok_emb = self.token_embedding_table(idx)  # (B, T, C)
         pos_emb = self.position_embedding_table(torch.arange(T, device=device))  # (T, C)
         x = tok_emb + pos_emb  # (B, T, C)
-        x = self.sa_head(x)  # apply one-head of self-attention, (B, T, C)
+        # x = self.sa_head(x)  # apply one-head of self-attention, (B, T, C)
+        # x = self.ffwd(x)  # (B, T, C)
+        x = self.block(x)  # (B, T, C)
         logits = self.lm_head(x)  # (B, T, vocab_size)
         
         if targets is None:
@@ -133,8 +193,8 @@ class BigramModel(nn.Module):
         return idx
 
 
-model = BigramModel()
-m = model.to(device)
+model = BigramModel().to(device)
+m = model
 
 # create a PyTorch optimizer
 optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
