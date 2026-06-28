@@ -22,3 +22,8 @@ This living document tracks architectural insights, optimization breakthroughs, 
 * **Insight:** In character-level modeling, word-level perplexity estimation can be misleading due to variable word lengths and tokenization definitions.
 * **Lesson:** Bits-per-character (BPC) represents the Shannon entropy of predictions in base 2 and is the correct objective standard. Carving out a clean 5% test set from the held-out validation segment showed a Test BPC of 1.8421 compared to Validation BPC of 1.8267, verifying stable generalization without split leakage.
 
+### 5. Temperature and Top-K Diversity Dynamics
+* **Insight:** Autoregressive models behave very differently under different sampling parameters. Greedy decoding collapses into repeating patterns, while high-temperature decoding becomes chaotic.
+* **Lesson:** Running a sweep confirmed that at low temperatures (0.2) or Top-K=1, the model collapses into repetition (0.72 repetition rate). High temperatures (1.2) increase perplexity (4.57) representing a loss of structural coherence. Optimal sampling lies in the mid-range (Temp=0.5, Top-K=5) where the repetition rate drops to 0.00 and Self-BLEU-4 is low (0.0242), indicating diverse, fluent outputs.
+
+

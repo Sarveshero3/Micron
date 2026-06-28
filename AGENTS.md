@@ -23,4 +23,5 @@ This document records the contributions of the agentic engineering systems that 
   - Resolved chat repetition cycles by implementing a character-level repetition penalty in logits sampling.
   - Designed and executed the comprehensive evaluation suite (Core LM Metrics, Diversity, Memorization, Baselines, Robustness, Computational Efficiency, Attention maps).
   - Implemented `evaluation/eval_bpc.py` to evaluate validation and test BPC and gradient norm smoothness.
+  - Implemented `evaluation/eval_diversity.py` to calculate distinct n-gram ratios, Self-BLEU, and run temperature/top-k sweeps.
   - Cleaned and rewrote project documentation (`README.md`, `results/micron_evaluation_report.md`).
