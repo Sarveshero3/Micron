@@ -1,0 +1,20 @@
+# Model checkpoints (Weights)
+checkpoints/
+checkpoints/*.pt
+
+# Heavy raw datasets and dialogue text files
+data/qa_dataset.txt
+data/test_questions.txt
+data/input.txt
+data/output.txt
+
+# Python environment and cache files
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+.vscode/
+.idea/

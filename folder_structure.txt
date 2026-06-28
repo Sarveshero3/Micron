@@ -1,0 +1,37 @@
+Micron/
+├── src/                          # Core source code
+│   ├── Micron.py
+│   ├── bigram.py
+│   └── benchmark.py
+│
+├── data/                         # Data generation & corpus
+│   ├── download_corpus.py
+│   ├── generate_dataset.py
+│   ├── qa_dataset.txt
+│   ├── test_questions.txt
+│   ├── input.txt
+│   └── output.txt
+│
+├── evaluation/                   # Testing & evaluation scripts
+│   ├── test_model.py
+│   ├── get_stats.py
+│   ├── plot_domain_eval.py
+│   └── plot_intelligence.py
+│
+├── results/                       # Generated reports & plots
+│   ├── micron_evaluation_report.md
+│   ├── domain_evaluation.png
+│   ├── llm_intelligence_arena.png
+│   ├── loss_convergence.png
+│   └── model_comparison.png
+│
+├── checkpoints/                   # Saved model weights
+│   └── micron_model.pt
+│
+├── notebooks/                     # Jupyter notebooks
+│   ├── gpt-dev.ipynb
+│   └── notes.ipynb
+│
+├── .gitignore
+├── LICENSE
+└── README.md
