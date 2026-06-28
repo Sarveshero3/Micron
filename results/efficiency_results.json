@@ -1,0 +1,27 @@
+{
+    "flops_analysis": {
+        "attention_flops_per_block": 101842944,
+        "ffn_flops_per_block": 2359296,
+        "blocks_total_flops": 625213440,
+        "head_flops": 105216,
+        "total_flops_per_token": 625318656,
+        "mflops_per_token": 625.318656
+    },
+    "quantization_benchmark": {
+        "fp32_size_mb": 41.39589977264404,
+        "int8_size_mb": 10.89637279510498,
+        "fp32_throughput_tokens_per_sec": 91.40862600389102,
+        "int8_throughput_tokens_per_sec": 73.8485158739032,
+        "speedup_factor": 0.8078943870216326,
+        "fp32_val_loss": 1.2543222188949585,
+        "int8_val_loss": 1.26958427131176,
+        "loss_delta": 0.015262052416801453
+    },
+    "energy_consumption": {
+        "training_hours": 20.22,
+        "cpu_wattage_tdp": 65.0,
+        "total_energy_kwh": 1.3143,
+        "electricity_cost_usd": 0.210288,
+        "carbon_emissions_co2_kg": 0.499434
+    }
+}

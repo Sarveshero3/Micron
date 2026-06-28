@@ -27,4 +27,5 @@ This document records the contributions of the agentic engineering systems that 
   - Implemented `evaluation/eval_memorization.py` to run Levenshtein sliding window memorization checks on training data.
   - Implemented `evaluation/eval_baselines.py` to evaluate count-based Bigram/Trigram baselines and train model scaling sweeps (1M to 25M params).
   - Implemented `evaluation/eval_robustness.py` to measure context limit sensitivity, typo noise tolerance, and multi-turn coherence overlap.
+  - Implemented `evaluation/eval_efficiency.py` to compute analytical FLOPs, run CPU quantization benchmarks, and estimate training carbon/electricity costs.
   - Cleaned and rewrote project documentation (`README.md`, `results/micron_evaluation_report.md`).

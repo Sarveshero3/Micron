@@ -38,6 +38,11 @@ This living document tracks architectural insights, optimization breakthroughs, 
 * **Insight:** Sub-word BPE tokenizers cushion minor spelling errors. Character-level models evaluate each byte/char directly, magnifying noise.
 * **Lesson:** Introducing a small 5% character typo rate (swaps/deletions) causes prediction loss to skyrocket from 1.37 to 6.25, demonstrating extreme fragility. However, context window scaling tests proved that loss monotonically drops from 1.57 (10-char context) to 1.23 (200-char context), validating that the model successfully absorbs long-context history to improve predictions.
 
+### 9. Dynamic Quantization and Quadratic Attention FLOPs
+* **Insight:** In small context-length transformers, attention math can be heavily dominated by the quadratic sequence length term rather than Feed-Forward parameters.
+* **Lesson:** Analytical FLOP counts showed that multi-head attention (101.8 MFLOPs per block) dominates the FFN (2.36 MFLOPs) by 43x due to the $O(T^2 d)$ attention matrix multiplication. Dynamic INT8 quantization on CPU reduced model size by 3.8x (41.4MB to 10.9MB) with a minimal validation loss delta of 0.0153. However, it resulted in a 0.81x speedup (actually slowing down generation) due to the quantization/dequantization overhead in memory-bandwidth-bound 10.8M parameter models.
+
+
 
 
 
