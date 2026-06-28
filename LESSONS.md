@@ -42,6 +42,11 @@ This living document tracks architectural insights, optimization breakthroughs, 
 * **Insight:** In small context-length transformers, attention math can be heavily dominated by the quadratic sequence length term rather than Feed-Forward parameters.
 * **Lesson:** Analytical FLOP counts showed that multi-head attention (101.8 MFLOPs per block) dominates the FFN (2.36 MFLOPs) by 43x due to the $O(T^2 d)$ attention matrix multiplication. Dynamic INT8 quantization on CPU reduced model size by 3.8x (41.4MB to 10.9MB) with a minimal validation loss delta of 0.0153. However, it resulted in a 0.81x speedup (actually slowing down generation) due to the quantization/dequantization overhead in memory-bandwidth-bound 10.8M parameter models.
 
+### 10. Attention Map Extraction via Dynamic Monkey Patching
+* **Insight:** Fast C++ attention kernels (FlashAttention) skip materializing attention matrices in memory, preventing simple activation logging.
+* **Lesson:** We intercepted the attention layers dynamically by replacing `MultiHeadAttention.forward` in Python with a custom manual attention forward method. This extracted high-resolution attention heatmaps across all 6 heads. Labeled plot axes revealed distinct attention behaviors: some heads attend local-diagonally (previous token focus), while others attend heavily to structural punctuation (like `\n` and `:`), illustrating how the self-attention mechanism decomposes text syntax.
+
+
 
 
 
