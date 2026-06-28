@@ -26,4 +26,9 @@ This living document tracks architectural insights, optimization breakthroughs, 
 * **Insight:** Autoregressive models behave very differently under different sampling parameters. Greedy decoding collapses into repeating patterns, while high-temperature decoding becomes chaotic.
 * **Lesson:** Running a sweep confirmed that at low temperatures (0.2) or Top-K=1, the model collapses into repetition (0.72 repetition rate). High temperatures (1.2) increase perplexity (4.57) representing a loss of structural coherence. Optimal sampling lies in the mid-range (Temp=0.5, Top-K=5) where the repetition rate drops to 0.00 and Self-BLEU-4 is low (0.0242), indicating diverse, fluent outputs.
 
+### 6. Memorization Rates in Small Autoregressive Models
+* **Insight:** Small transformers (10.8M parameters) trained on highly structured data can sometimes memorize sequences verbatim.
+* **Lesson:** Running a sliding-window Levenshtein search (window length 30, similarity threshold >= 90%) over generated samples against the unique training corpus blocks yielded a 0.00% memorization rate. This indicates that despite its low validation loss, the model acts as a probabilistic generator, synthesizing novel sentence boundaries rather than reproducing training logs verbatim.
+
+
 

@@ -1,0 +1,162 @@
+{
+    "memorization_rate": 0.0,
+    "memorized_count": 0,
+    "total_samples": 30,
+    "evaluated_samples": 16,
+    "window_length": 30,
+    "edit_threshold": 3,
+    "scan_time_seconds": 0.17611217498779297,
+    "all_generations": [
+        {
+            "prompt": "Why do programmers wear glasses?",
+            "response": "Yes.  Why do you think the body was a class of started with the original that the window?",
+            "length": 89
+        },
+        {
+            "prompt": "What is your name?",
+            "response": "Who?",
+            "length": 4
+        },
+        {
+            "prompt": "How do you learn?",
+            "response": "I'm sorry to say that.  I want you to go to the wheel aren't you gonna get out of here.  I wouldn't",
+            "length": 99
+        },
+        {
+            "prompt": "Tell me a joke.",
+            "response": "Thanks.",
+            "length": 7
+        },
+        {
+            "prompt": "How do you handle stress?",
+            "response": "Well, that's all.",
+            "length": 17
+        },
+        {
+            "prompt": "How do you handle stress?",
+            "response": "Huh?",
+            "length": 4
+        },
+        {
+            "prompt": "What is the meaning of life?",
+            "response": "Nothing.",
+            "length": 8
+        },
+        {
+            "prompt": "Can you think?",
+            "response": "They won't be a press considered of his house.  I'll be a considered of his house.",
+            "length": 82
+        },
+        {
+            "prompt": "Are you sentient?",
+            "response": "Yes.",
+            "length": 4
+        },
+        {
+            "prompt": "What is a neural network?",
+            "response": "I don't know, sir.",
+            "length": 18
+        },
+        {
+            "prompt": "Tell me a joke.",
+            "response": "I don't know what I'm doing in anymore.",
+            "length": 39
+        },
+        {
+            "prompt": "Why does my code not work?",
+            "response": "I don't know... I don't know... I don't know... I don't know... I don't know... I don't... I don't",
+            "length": 98
+        },
+        {
+            "prompt": "Are you sentient?",
+            "response": "There's nothing to be any price.",
+            "length": 32
+        },
+        {
+            "prompt": "How do you learn?",
+            "response": "Huh?",
+            "length": 4
+        },
+        {
+            "prompt": "Who is your creator?",
+            "response": "I don't know who we are.  I want a story it on the state.",
+            "length": 57
+        },
+        {
+            "prompt": "What is a tensor?",
+            "response": "No...  Not a little business.",
+            "length": 29
+        },
+        {
+            "prompt": "Tell me a joke.",
+            "response": "I don't know what it is, but I've got to be a body.",
+            "length": 51
+        },
+        {
+            "prompt": "Why is a screen called a screen if it doesn't scream?",
+            "response": "It isn't that the way I can do about that.",
+            "length": 42
+        },
+        {
+            "prompt": "What is the best GPU?",
+            "response": "It's not the best one.  All of the time is the best one of those short can be a better of people ar",
+            "length": 99
+        },
+        {
+            "prompt": "What is a neural network?",
+            "response": "I don't know.",
+            "length": 13
+        },
+        {
+            "prompt": "Are you sentient?",
+            "response": "No.  I don't think so.  They said I'm a big situation.  We've got to come out of the street.",
+            "length": 92
+        },
+        {
+            "prompt": "I love My wife Sara Kizuki",
+            "response": "Well... It's all the one who wants to be a good man in here.",
+            "length": 60
+        },
+        {
+            "prompt": "What happens when you die?",
+            "response": "I don't know. I want to talk to you about it. I thought you were a little boy.",
+            "length": 78
+        },
+        {
+            "prompt": "How do you learn?",
+            "response": "I don't know.",
+            "length": 13
+        },
+        {
+            "prompt": "What is a tensor?",
+            "response": "The people in the world.",
+            "length": 24
+        },
+        {
+            "prompt": "Tell me a joke.",
+            "response": "No, it's not really a little thing I saw to you.",
+            "length": 48
+        },
+        {
+            "prompt": "Are you sentient?",
+            "response": "I don't know.  I didn't know what is it.",
+            "length": 40
+        },
+        {
+            "prompt": "Are you sentient?",
+            "response": "Yes.",
+            "length": 4
+        },
+        {
+            "prompt": "Why does my code not work?",
+            "response": "I won't take that to you.",
+            "length": 25
+        },
+        {
+            "prompt": "What is a tensor?",
+            "response": "I don't know. I'm not sure. I just don't know. I just don't know what it is.",
+            "length": 76
+        }
+    ],
+    "matches": []
+}

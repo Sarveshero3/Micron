@@ -24,4 +24,5 @@ This document records the contributions of the agentic engineering systems that 
   - Designed and executed the comprehensive evaluation suite (Core LM Metrics, Diversity, Memorization, Baselines, Robustness, Computational Efficiency, Attention maps).
   - Implemented `evaluation/eval_bpc.py` to evaluate validation and test BPC and gradient norm smoothness.
   - Implemented `evaluation/eval_diversity.py` to calculate distinct n-gram ratios, Self-BLEU, and run temperature/top-k sweeps.
+  - Implemented `evaluation/eval_memorization.py` to run Levenshtein sliding window memorization checks on training data.
   - Cleaned and rewrote project documentation (`README.md`, `results/micron_evaluation_report.md`).
