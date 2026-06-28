@@ -34,6 +34,11 @@ This living document tracks architectural insights, optimization breakthroughs, 
 * **Insight:** Evaluating models against simple count-based systems prevents architectural confirmation bias and maps return on model capacity scaling.
 * **Lesson:** Baseline evaluations showed BPC scores of 3.31 (Bigram Count) and 2.21 (Trigram Count). A simple neural lookup table bigram model reached 3.45 BPC. Converged Micron (10.8M params, 10k steps) reached 1.27 BPC, proving massive gains from deep contextual self-attention. Training model scaling variants from 1M to 25M parameters for 40 steps mapped early power-law scaling (loss dropping from 2.61 to 2.35), though larger models require more initialization steps to amortize training overhead.
 
+### 8. Noise Fragility in Character-Level Models
+* **Insight:** Sub-word BPE tokenizers cushion minor spelling errors. Character-level models evaluate each byte/char directly, magnifying noise.
+* **Lesson:** Introducing a small 5% character typo rate (swaps/deletions) causes prediction loss to skyrocket from 1.37 to 6.25, demonstrating extreme fragility. However, context window scaling tests proved that loss monotonically drops from 1.57 (10-char context) to 1.23 (200-char context), validating that the model successfully absorbs long-context history to improve predictions.
+
+
 
 
 
