@@ -22,4 +22,5 @@ This document records the contributions of the agentic engineering systems that 
   - Added the training `--resume` flag to allow seamless continuation of weights and AdamW optimizer states from checkpoint.
   - Resolved chat repetition cycles by implementing a character-level repetition penalty in logits sampling.
   - Designed and executed the comprehensive evaluation suite (Core LM Metrics, Diversity, Memorization, Baselines, Robustness, Computational Efficiency, Attention maps).
+  - Implemented `evaluation/eval_bpc.py` to evaluate validation and test BPC and gradient norm smoothness.
   - Cleaned and rewrote project documentation (`README.md`, `results/micron_evaluation_report.md`).

@@ -17,3 +17,8 @@ This living document tracks architectural insights, optimization breakthroughs, 
 ### 3. Logits Repetition Loops in Character Models
 * **Insight:** Autoregressive character-level models easily lock into repetitive n-gram loops (e.g. repeating "I don't know") due to self-attending to highly frequent training phrases.
 * **Lesson:** Lowering temperatures makes generation too deterministic, exacerbating loops. Introducing a gentle repetition penalty directly in the logits sampling step (reducing logits for recently generated alphanumeric characters) breaks these cycles effectively.
+
+### 4. Bits-Per-Character (BPC) as standard metric
+* **Insight:** In character-level modeling, word-level perplexity estimation can be misleading due to variable word lengths and tokenization definitions.
+* **Lesson:** Bits-per-character (BPC) represents the Shannon entropy of predictions in base 2 and is the correct objective standard. Carving out a clean 5% test set from the held-out validation segment showed a Test BPC of 1.8421 compared to Validation BPC of 1.8267, verifying stable generalization without split leakage.
+
