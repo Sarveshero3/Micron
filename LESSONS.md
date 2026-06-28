@@ -30,5 +30,10 @@ This living document tracks architectural insights, optimization breakthroughs, 
 * **Insight:** Small transformers (10.8M parameters) trained on highly structured data can sometimes memorize sequences verbatim.
 * **Lesson:** Running a sliding-window Levenshtein search (window length 30, similarity threshold >= 90%) over generated samples against the unique training corpus blocks yielded a 0.00% memorization rate. This indicates that despite its low validation loss, the model acts as a probabilistic generator, synthesizing novel sentence boundaries rather than reproducing training logs verbatim.
 
+### 7. Count-based Baselines and Parameter Scaling Curves
+* **Insight:** Evaluating models against simple count-based systems prevents architectural confirmation bias and maps return on model capacity scaling.
+* **Lesson:** Baseline evaluations showed BPC scores of 3.31 (Bigram Count) and 2.21 (Trigram Count). A simple neural lookup table bigram model reached 3.45 BPC. Converged Micron (10.8M params, 10k steps) reached 1.27 BPC, proving massive gains from deep contextual self-attention. Training model scaling variants from 1M to 25M parameters for 40 steps mapped early power-law scaling (loss dropping from 2.61 to 2.35), though larger models require more initialization steps to amortize training overhead.
+
+
 
 

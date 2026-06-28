@@ -1,0 +1,45 @@
+{
+    "count_bigram": {
+        "bigram_loss": 2.292746936763668,
+        "bigram_bpc": 3.307734635682306,
+        "trigram_loss": 1.5310387071545506,
+        "trigram_bpc": 2.20882195022092
+    },
+    "lookup_bigram": {
+        "loss": 2.3930296897888184,
+        "bpc": 3.452412066158383
+    },
+    "scaling_law": {
+        "variants": [
+            {
+                "name": "Tiny (~1M)",
+                "params": 464009,
+                "val_loss": 2.6143639087677,
+                "val_bpc": 3.7717298462582476
+            },
+            {
+                "name": "Small (~5M)",
+                "params": 3292297,
+                "val_loss": 2.393455743789673,
+                "val_bpc": 3.4530267321525665
+            },
+            {
+                "name": "Medium (~11M)",
+                "params": 10844297,
+                "val_loss": 2.35636568069458,
+                "val_bpc": 3.3995170820590173
+            },
+            {
+                "name": "Large (~20M)",
+                "params": 25479305,
+                "val_loss": 2.3667781352996826,
+                "val_bpc": 3.41453907868128
+            }
+        ],
+        "fully_converged_micron": {
+            "params": 10797388,
+            "val_loss": 0.8817,
+            "val_bpc": 1.272024217551799
+        }
+    }
+}
