@@ -187,12 +187,66 @@ def train_scaling_variant(train_data, val_data, vocab_size, block_size, n_embd, 
     
     return num_params, mean_val_loss, bpc
 
-def run_baselines_and_scaling():
+def plot_results(results, output_plot_path, num_steps):
+    print("Generating scaling law plots...")
+    counts_res = results["count_bigram"]
+    lookup_val_loss = results["lookup_bigram"]["loss"]
+    variants = results["scaling_law"]["variants"]
+    param_counts = [v["params"] for v in variants]
+    val_losses = [v["val_loss"] for v in variants]
+    
+    converged_params = results["scaling_law"]["fully_converged_micron"]["params"]
+    converged_val_loss = results["scaling_law"]["fully_converged_micron"]["val_loss"]
+    
+    fig, ax1 = plt.subplots(figsize=(10, 6))
+    
+    # Plot scaling curve for short runs
+    ax1.plot(param_counts, val_losses, 'o-', color='#1f77b4', linewidth=2.5, label=f'{num_steps}-step Training Variants')
+    for i, txt in enumerate(["Tiny", "Small", f"Medium ({num_steps}s)", "Large"]):
+        ax1.annotate(txt, (param_counts[i], val_losses[i]), textcoords="offset points", xytext=(0,10), ha='center', fontweight="bold")
+        
+    # Mark fully converged Micron checkpoint (from 10k step run)
+    ax1.plot(converged_params, converged_val_loss, '*', markersize=14, color='#e377c2', label='Converged Micron (10k steps)')
+    ax1.annotate("Fully Converged (10k)", (converged_params, converged_val_loss), textcoords="offset points", xytext=(0,-20), ha='center', color='#e377c2', fontweight="bold")
+    
+    # Mark Baselines as horizontal lines
+    ax1.axhline(y=counts_res["bigram_loss"], color='#ff7f0e', linestyle='--', label='Count Bigram Baseline')
+    ax1.axhline(y=lookup_val_loss, color='#2ca02c', linestyle='-.', label='Lookup Table Bigram')
+    ax1.axhline(y=counts_res["trigram_loss"], color='#bcbd22', linestyle=':', label='Count Trigram Baseline')
+    
+    ax1.set_xscale('log')
+    ax1.set_xlabel('Model Parameter Count (Log Scale)', fontsize=11)
+    ax1.set_ylabel('Validation Cross-Entropy Loss', fontsize=11)
+    ax1.grid(True, which="both", linestyle="--", alpha=0.5)
+    ax1.set_title("Micron LLM: N-Gram Baselines & Parameter Scaling Curves", fontsize=13, fontweight="bold")
+    
+    # Position legend to the right side of the plot
+    ax1.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0.0)
+    
+    plt.tight_layout()
+    plt.savefig(output_plot_path, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"Scaling plot saved to: {output_plot_path}")
+
+def run_baselines_and_scaling(plot_only=False):
     print("==================================================")
     checkpoint_path = os.path.abspath(os.path.join(script_dir, "..", "checkpoints", "micron_model.pt"))
     dataset_path = os.path.abspath(os.path.join(script_dir, "..", "data", "qa_dataset.txt"))
     output_json_path = os.path.abspath(os.path.join(script_dir, "..", "results", "baseline_scaling_results.json"))
     output_plot_path = os.path.abspath(os.path.join(script_dir, "..", "results", "scaling_laws.png"))
+
+    num_steps = 200 if device == 'cuda' else 40
+
+    if plot_only:
+        if not os.path.exists(output_json_path):
+            print(f"Error: Results file '{output_json_path}' not found. Cannot run plot-only mode without existing results.")
+            sys.exit(1)
+        print(f"Loading baseline and scaling results from: {output_json_path}")
+        with open(output_json_path, "r") as f:
+            results = json.load(f)
+        plot_results(results, output_plot_path, num_steps)
+        print("==================================================")
+        return
 
     if not os.path.exists(checkpoint_path):
         print(f"Error: Checkpoint file '{checkpoint_path}' not found.")
@@ -241,7 +295,6 @@ def run_baselines_and_scaling():
     val_losses = []
     val_bpcs = []
     
-    num_steps = 200 if device == 'cuda' else 40
     for conf in configs:
         ckpt_file = os.path.abspath(os.path.join(script_dir, "..", "checkpoints", conf["file"]))
         p_count, v_loss, v_bpc = train_scaling_variant(
@@ -294,36 +347,13 @@ def run_baselines_and_scaling():
         json.dump(results, f, indent=4)
     print(f"\nBaseline and Scaling results saved to: {output_json_path}")
     
-    # 4. Generate plots
-    print("Generating scaling law plots...")
-    fig, ax1 = plt.subplots(figsize=(9, 6))
-    
-    # Plot scaling curve for short runs
-    ax1.plot(param_counts, val_losses, 'o-', color='#1f77b4', linewidth=2.5, label=f'{num_steps}-step Training Variants')
-    for i, txt in enumerate(["Tiny", "Small", f"Medium ({num_steps}s)", "Large"]):
-        ax1.annotate(txt, (param_counts[i], val_losses[i]), textcoords="offset points", xytext=(0,10), ha='center', fontweight="bold")
-        
-    # Mark fully converged Micron checkpoint (from 10k step run)
-    ax1.plot(converged_params, converged_val_loss, '*', markersize=14, color='#e377c2', label='Converged Micron (10k steps)')
-    ax1.annotate("Fully Converged (10k)", (converged_params, converged_val_loss), textcoords="offset points", xytext=(0,-20), ha='center', color='#e377c2', fontweight="bold")
-    
-    # Mark Baselines as horizontal lines
-    ax1.axhline(y=counts_res["bigram_loss"], color='#ff7f0e', linestyle='--', label='Count Bigram Baseline')
-    ax1.axhline(y=lookup_val_loss, color='#2ca02c', linestyle='-.', label='Lookup Table Bigram')
-    ax1.axhline(y=counts_res["trigram_loss"], color='#bcbd22', linestyle=':', label='Count Trigram Baseline')
-    
-    ax1.set_xscale('log')
-    ax1.set_xlabel('Model Parameter Count (Log Scale)', fontsize=11)
-    ax1.set_ylabel('Validation Cross-Entropy Loss', fontsize=11)
-    ax1.grid(True, which="both", linestyle="--", alpha=0.5)
-    ax1.set_title("Micron LLM: N-Gram Baselines & Parameter Scaling Curves", fontsize=13, fontweight="bold")
-    ax1.legend(loc="upper right")
-    
-    plt.tight_layout()
-    plt.savefig(output_plot_path, dpi=200)
-    plt.close()
-    print(f"Scaling plot saved to: {output_plot_path}")
+    plot_results(results, output_plot_path, num_steps)
     print("==================================================")
 
 if __name__ == "__main__":
-    run_baselines_and_scaling()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--plot-only', action='store_true', help='Only regenerate the plot from existing baseline_scaling_results.json')
+    args = parser.parse_args()
+    
+    run_baselines_and_scaling(plot_only=args.plot_only)
